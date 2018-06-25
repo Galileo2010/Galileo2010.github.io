@@ -9,6 +9,7 @@
     <script src='https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js'></script>
     <script src='https://unpkg.com/prop-types@15.6/prop-types.js'></script>
     <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+    <script src="https://cdn.bootcss.com/pubsub-js/1.6.0/pubsub.js"></script>
 </head>
 
 <body>
@@ -16,32 +17,16 @@
     <script type='text/babel'>
             // 1.组件划分<App <SearchInput/><SearchResult/>/>
             class App extends React.Component{
-
-                state = {
-                    searchName:''
-                }
-
-                onSetSearchName = (name)=>{
-                    
-                    this.state.searchName = name
-                    this.setState(this.state)
-                }
                 render(){
                     return (<div>
-                        <SearchInput onSetSearchName = {this.onSetSearchName}/>
-                        <SearchResult searchName = {this.state.searchName}/>
+                        <SearchInput/>
+                        <SearchResult/>
                     </div>)
                 }
             }
             class SearchInput extends React.Component{
-
-                static propTypes ={
-                    onSetSearchName: PropTypes.func.isRequired
-                }
-
                 handleClick = ()=>{
-                    const name = this.input.value
-                    this.props.onSetSearchName(name)
+                    PubSub.publish( 'search', this.input.value)
                 }
                 render(){
                     return (<div>
@@ -51,33 +36,23 @@
                 }
             }
             class SearchResult extends React.Component{
-                static propTypes ={
-                    searchName: PropTypes.string.isRequired
-                }
-
                 state = {
-                    searchName:'',
                     resultData:[]
                 }
 
-                componentWillReceiveProps(nextProps){
-                    if (this.state.searchName === nextProps.searchName) return
-                    this.state.searchName = nextProps.searchName
-                    const url = "https://www.sojson.com/open/api/weather/json.shtml?city="+ this.state.searchName
-                    
+                componentDidMount(){
+                    PubSub.subscribe( 'search', ( message, searchName )=>{  
+                    const url = "https://www.sojson.com/open/api/weather/json.shtml?city="+ searchName
                     axios.get(url).then(response =>{
                         const strData = response.request.response
                         const jsonData = eval('(' + strData + ')')
-                         this.setState({
-                     searchName:this.state.searchName,
-                    resultData:jsonData.data.forecast
-                })
-                    }).catch(error =>{console.log("fuckerror")})
+                         this.setState({resultData:jsonData.data.forecast})
+                    }).catch(error =>{console.log("fuckerror")})} ); 
                 }
 
                 render(){
-                    if(this.state.searchName ==='')
-                        return (<h1>请在输入框中输入地名...</h1>)
+                    if(this.state.resultData.length === 0)
+                        return (<h1>请在输入框中输入有效的地名...</h1>)
                     else
                         return ( <ul>
                         {this.state.resultData.map((item, index) => <li key = {index}>
