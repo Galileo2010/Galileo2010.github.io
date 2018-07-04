@@ -24,8 +24,8 @@
                 }
 
                 componentWillMount() {
-                    let width = 10;
-                    let height = 10;
+                    let width = 20;
+                    let height = 20;
                     let ages = new Array(height)
                     for(var i=0;i<height;i++){        //一维长度为i,i为变量，可以根据实际情况改变  
                         ages[i]=new Array(width);    //声明二维，每一个一维数组里面的一个元素都是一个数组
@@ -75,7 +75,7 @@
                     }
                     else if (counter === 2) 
                     {
-                        return oldAges[i][j]
+                        return (oldAges[i][j] === undefined) ? undefined : oldAges[i][j] + 1;
                     }
                     else
                     {
@@ -114,7 +114,11 @@
                     
                     for (let i = 0; i < height; i++) {
                         for (let j = 0; j < width; j++) {
-                            canvasCtx.fillStyle = (ages[i][j] === undefined) ? "#000000" : "#0000ff";
+                            if(ages[i][j] === undefined)    canvasCtx.fillStyle = "#e6e6e6";  
+                            else if(ages[i][j] === 1)    canvasCtx.fillStyle = "#00ffff";  
+                            else if(ages[i][j] === 2)    canvasCtx.fillStyle = "#0066ff";  
+                            else if(ages[i][j] === 3)    canvasCtx.fillStyle = "#0000ff";  
+                            else    canvasCtx.fillStyle = "#0000ff";  
                             this.DrawReact(canvasCtx, j * cellWidth, i * cellHeight, cellWidth, cellHeight)  
                         }
                     }                    
