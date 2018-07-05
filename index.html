@@ -40,14 +40,23 @@
                     ages[10][7] = 1
                     ages[10][8] = 1
                     ages[10][9] = 1
+                    ages[10][10] = 1
+                    ages[10][11] = 1
+                    ages[10][12] = 1
+                    ages[10][13] = 1
+                    ages[10][14] = 1
+                    ages[10][15] = 1
+                    ages[10][16] = 1
+                    ages[10][17] = 1
+                    ages[10][18] = 1
+                    ages[10][19] = 1
 
-                    console.log(ages)
                     this.setState({
                         size:{
                             width,height
                         },
                         ages:ages
-                    })               
+                    })
                 }
 
                 isillegal = (i,j) =>{
@@ -89,13 +98,9 @@
                     }
                 }
 
-
                 updateAges = ()=>{
                     let {size,ages} = this.state;
-                    console.log(ages);
-                    
                     let newAges = new Array(ages.length);
-                    console.log(newAges);
                     for (let i = 0; i < ages.length; i++) {
                         [...newAges[i]] = ages[i];
                         for (let j = 0; j < ages[i].length; j++) {
@@ -112,8 +117,8 @@
                     let width = this.state.size.width;
                     let height = this.state.size.height;
                     let ages = this.state.ages;
-                     var canvas = document.getElementById(id);
-                    var canvasCtx = canvas.getContext("2d");
+                    let canvas = document.getElementById(id);
+                    let canvasCtx = canvas.getContext("2d");
                     
                     let cellWidth = canvas.width / width;
                     let cellHeight = canvas.height / height;
@@ -149,8 +154,6 @@
                     } else {
                         ages[i][j] = undefined;
                     }
-                    
-                    console.log(i+" "+ j);
                     this.setState({size:size,ages:ages})
                     this.DrawReacts("mycanvas")
                 }
@@ -160,18 +163,18 @@
                     PubSub.subscribe( 'setSize', ( message, size )=>{
                         let width = size[0];
                         let height = size[1];
-                        console.log(size[0]);
-                        console.log(size[1]);
                         let ages = new Array(height)
                         for(var i=0;i<height;i++){        //一维长度为i,i为变量，可以根据实际情况改变  
                             ages[i]=new Array(width);    //声明二维，每一个一维数组里面的一个元素都是一个数组
                         }
+
                         this.setState({
                             size:{
                                 width,height
                             },
                             ages:ages
                         })
+
                         this.DrawReacts("mycanvas")        
                     })
 
@@ -186,7 +189,10 @@
                 render(){
                     return (<div>
                         <SetGame/>
-                        <canvas id = "mycanvas" width="500" height="500" onClick = {this.handleClick}></canvas>
+                        <div className = "container">
+                            <canvas id = "mycanvas" width = "900" height = "900" onClick = {this.handleClick}></canvas>
+                        </div>
+                        
                     </div>)
                 }
             }
@@ -194,21 +200,28 @@
                 handleClick1 = ()=>{
                     let size = [this.input1.value * 1, this.input2.value * 1]
                     PubSub.publish( 'setSize', size)
-                    console.log(size)
                 }
                 handleClick2 = ()=>{
-                    PubSub.publish( 'evolution', 1)
+                    if (this.timerID !== undefined){
+                        clearInterval(this.timerID);
+                        this.timerID = undefined
+                    }
+                    else
+                        PubSub.publish( 'evolution', 1)
+                }
+
+                 handleClick3 = ()=>{
+                    this.timerID = setInterval(()=>{PubSub.publish( 'evolution', 1)},400)
                 }
                 render(){
                     return (<div>
-                    <a>设置width</a>
-                    <input ref = {input => this.input1 = input}/>
-                    <a>设置height</a>
+                    <a>行数</a>
                     <input  ref = {input => this.input2 = input}/>
+                    <a>列数</a>
+                    <input ref = {input => this.input1 = input}/>
                     <button onClick = {this.handleClick1}>修改尺寸</button>
-                    <br/>
                     <button onClick = {this.handleClick2}>单步演化</button>
-                    <button onClick = {this.handleClick}>自动演化</button>
+                    <button onClick = {this.handleClick3}>自动演化</button>
                     </div>)
                 }
             }
@@ -220,10 +233,20 @@
            
         </script>
 </body>
-<style>
-canvas{
-   
-    background-color:darkgray; /* 6217002870060500335 */
+<style type="text/css">
+
+a{
+    width: 80px;
+    height: 40px;
+}
+input{
+    width: 80px;
+    height: 30px;
+}
+
+button{
+    width: 80px;
+    height: 40px;
 }
 </style>
 </html>
