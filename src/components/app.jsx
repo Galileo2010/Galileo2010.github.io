@@ -1,21 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset='UTF-8' />
-    <title>生命游戏</title>
-    <script crossorigin src='https://unpkg.com/react@16/umd/react.development.js'></script><!--react库-->
-    <script crossorigin src='https://unpkg.com/react-dom@16/umd/react-dom.development.js'></script><!--ReactDom库-->
-    <script src='https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js'></script><!--Babel-->
-    <script src="https://cdn.bootcss.com/pubsub-js/1.6.0/pubsub.js"></script><!--消息路由-->
-</head>
-
-<body>
-    <div id='demo'></div>
-    <script type='text/babel'>
-            // 1.组件划分<App <SetGame/><ShowGame/>/>
-            class App extends React.Component{
-
-               // 设置状态
+import React,{ Component } from "react";
+import PubSub from "pubsub-js";
+import SetGame from "./setgame";
+export default class App extends Component{
+    // 设置状态
     state = {
         size: {width: 0,height: 0},
         ages: []
@@ -42,6 +29,8 @@
         PubSub.subscribe('setSize', (message, size) => {
             let width = size[0];
             let height = size[1];
+            console.log(size);
+            
             let ages = new Array(height)
             for (var i = 0; i < height; i++) {        //一维长度为i,i为变量，可以根据实际情况改变  
                 ages[i] = new Array(width);    //声明二维，每一个一维数组里面的一个元素都是一个数组
@@ -147,81 +136,10 @@
         }
     }
 
-                render(){
-                    return (<div>
-                        <SetGame/>
-                        <div className = "container">
-                            <canvas id = "mycanvas" width = "900" height = "900" onClick = {this.handleClick}></canvas>
-                        </div>
-                        
-                    </div>)
-                }
-            }
-            class SetGame extends React.Component{
-                handleClick1 = ()=>{
-                    let size = [this.input1.value * 1, this.input2.value * 1]
-                    PubSub.publish( 'setSize', size)
-                }
-                handleClick2 = ()=>{
-                    if (this.timerID !== undefined){
-                        clearInterval(this.timerID);
-                        this.timerID = undefined
-                    }
-                    else
-                        PubSub.publish( 'evolution', 1)
-                }
-
-                 handleClick3 = ()=>{
-                    this.timerID = setInterval(()=>{PubSub.publish( 'evolution', 1)},400)
-                }
-                render(){
-                    return (<div className = "CtrlBar">
-                    <a>行数</a>
-                    <input  ref = {input => this.input2 = input}/>
-                    <a>列数</a>
-                    <input ref = {input => this.input1 = input}/>
-                    <button onClick = {this.handleClick1}>修改尺寸</button>
-                    <button onClick = {this.handleClick2}>单步演化</button>
-                    <button onClick = {this.handleClick3}>自动演化</button>
-                    </div>)
-                }
-            }
-            ReactDOM.render(<App/>, document.getElementById('demo'))
-        </script>
-
-        <script>
-
-           
-        </script>
-</body>
-<style type="text/css">
-.CtrlBar{
-     width: 900px;
-    height: 55px;
+    render() {
+        return (<div>
+            <SetGame />
+            <canvas className="shit" id="mycanvas" width = "900" height = "900" onClick={this.handleClick} />
+        </div>)
+    }
 }
-a{
-    width: 100px;
-    height: 40px;
-}
-input{
-    width: 100px;
-    height: 30px;
-}
-
-canvas{
-    cursor: pointer;
-}
-
-button {
-    width: 200px;
-    height: 40px;
-    font-family:Arial;
-    padding: 5px 5px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    margin: 4px 4px;
-    cursor: pointer;
-}
-</style>
-</html>
